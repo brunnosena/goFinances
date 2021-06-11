@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigation } from "@react-navigation/core";
 import { Modal, TouchableWithoutFeedback, Keyboard, Alert } from "react-native";
 import { yupResolver } from "@hookform/resolvers/yup";
 import uuid from "react-native-uuid";
 import * as Yup from "yup";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Button } from "../../components/Form/Button";
 import { CategorySelectButton } from "../../components/Form/CategorySelectButton";
@@ -20,6 +22,7 @@ import {
   Fields,
   TransactionsTypes,
 } from "./styles";
+import AppInfo from "../../../app.json";
 
 interface FormData extends DataListProps {}
 
@@ -31,7 +34,19 @@ const schema = Yup.object().shape({
 		.required("Insira um valor!"),
 });
 
+async function clearDataFromAsyncStorage(Key: string) {
+	const data = await AsyncStorage.removeItem(Key);
+	console.log("Cleared transaction data:", data);
+}
+
+export const dataKey = "@" + AppInfo.name + ":" + "transactions_user:";
+
 export function Register() {
+  //const dataKey_ = dataKey + user!.id;
+  const dataKey_ = dataKey;
+  const clearAllTransactionData = false;
+	if (clearAllTransactionData) clearDataFromAsyncStorage(dataKey_);
+
   const [transactionType, setTransactionType] = useState<IconProps["type"] | "">("");
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [category, setCategory] = useState({
@@ -44,6 +59,7 @@ export function Register() {
 		formState: { errors },
 		reset,
 	} = useForm({ resolver: yupResolver(schema) });
+  const navigation = useNavigation();
 
   function handleTransactionTypeSelect(type: IconProps["type"]) {
     setTransactionType(type);
@@ -70,6 +86,26 @@ export function Register() {
 			category: category.key,
 			date: String(new Date()),
 		};
+
+    try {
+			const response = await AsyncStorage.getItem(dataKey_);
+			const oldData: DataListProps[] = response ? JSON.parse(response) : [];
+			const newData = [...oldData, newTransaction];
+			//console.log("newData:", newData);
+			await AsyncStorage.setItem(dataKey_, JSON.stringify(newData));
+
+			reset();
+			setTransactionType("");
+			setCategory({
+				key: "category",
+				name: "Categoria",
+			});
+
+			navigation.navigate("Listagem");
+		} catch (error) {
+			console.error("Erro ao tentar armazenar form: FormData =>", error);
+			Alert.alert("Não foi possível armazenar seus dados!");
+		}
 	}
 
   return (

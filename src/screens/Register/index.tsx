@@ -6,6 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import uuid from "react-native-uuid";
 import * as Yup from "yup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "../../hooks/auth";
 
 import { Button } from "../../components/Form/Button";
 import { CategorySelectButton } from "../../components/Form/CategorySelectButton";
@@ -42,8 +43,8 @@ async function clearDataFromAsyncStorage(Key: string) {
 export const dataKey = "@" + AppInfo.name + ":" + "transactions_user:";
 
 export function Register() {
-  //const dataKey_ = dataKey + user!.id;
-  const dataKey_ = dataKey;
+  const { user } = useAuth();
+  const dataKey_ = dataKey + user!.id;
   const clearAllTransactionData = false;
 	if (clearAllTransactionData) clearDataFromAsyncStorage(dataKey_);
 

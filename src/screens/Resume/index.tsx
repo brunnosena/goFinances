@@ -12,7 +12,7 @@ import { ptBR } from "date-fns/locale";
 import { DataListProps } from "../Dashboard";
 import { HistoryCard } from "../../components/HistoryCard";
 import { categories } from "../../utils/categories";
-// import { useAuth } from "../../hooks/auth";
+import { useAuth } from "../../hooks/auth";
 import { dataKey } from "../Register";
 
 import {
@@ -39,7 +39,7 @@ interface CategoryData {
 
 export function Resume() {
 	const theme = useTheme();
-	// const { user } = useAuth();
+	const { user } = useAuth();
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [selectedDate, setSelectedDate] = useState(new Date());
@@ -55,8 +55,7 @@ export function Resume() {
 	async function loadFormattedData() {
 		setIsLoading(true);
 
-		// const dataKey_ = dataKey + user!.id;
-		const dataKey_ = dataKey;
+		const dataKey_ = dataKey + user!.id;
 		const response = await AsyncStorage.getItem(dataKey_);
 		const data: DataListProps[] = response ? JSON.parse(response) : [];
 

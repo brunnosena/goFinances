@@ -3,6 +3,7 @@ import { ActivityIndicator } from "react-native";
 import { useTheme } from 'styled-components';
 import { useFocusEffect } from "@react-navigation/core";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "../../hooks/auth";
 import { HighlightCard } from "../../components/HighlightCard";
 import {
   TransactionCard,
@@ -70,6 +71,7 @@ function getTransactionDate(
 
 export function Dashboard() {
   const theme = useTheme();
+  const { signOut, user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<DataListProps[]>([]);
   const [highlightCardData, setHighlightCardData] =
@@ -80,8 +82,7 @@ export function Dashboard() {
     });
 
   async function loadTransactionsFormatted() {
-    // const dataKey_ = dataKey + user!.id;
-    const dataKey_ = dataKey;
+    const dataKey_ = dataKey + user!.id;
     const response = await AsyncStorage.getItem(dataKey_);
     const transactions: DataListProps[] = response ? JSON.parse(response) : [];
 
@@ -166,20 +167,21 @@ export function Dashboard() {
         <>
           <Header>
             <UserWrapper>
-              <UserInfo>
-                <Photo
-                  source={{
-                    uri: "https://avatars.githubusercontent.com/u/15018891?v=4",
-                  }}
-                />
-                <User>
-                  <UserGreeting>Olá, </UserGreeting>
-                  <UserName>Brunno</UserName>
-                </User>
-              </UserInfo>
-              <LogoutButton onPress={() => {}}>
-                <Icon name="power" />
-              </LogoutButton>
+            <UserInfo>
+								<Photo
+									source={{
+										uri: user?.photo,
+									}}
+								/>
+								<User>
+									<UserGreeting>Olá,</UserGreeting>
+									<UserName>{user?.name}</UserName>
+								</User>
+							</UserInfo>
+
+							<LogoutButton onPress={signOut}>
+								<Icon name="power" />
+							</LogoutButton>
             </UserWrapper>
           </Header>
 

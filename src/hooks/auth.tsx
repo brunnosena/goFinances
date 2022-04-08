@@ -6,6 +6,7 @@ import React, {
 	useState,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ANDROID_CLIENT_ID, IOS_CLIENT_ID } from 'react-native-dotenv';
 
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Google from "expo-google-app-auth";
@@ -31,10 +32,6 @@ interface IAuthContextData {
 	isLoadingStoragedUser: boolean;
 }
 
-const IOS_CLIENT_ID =
-	"873978168538-hu03pv2qjndgis4p15jmp7gnku4hplh5.apps.googleusercontent.com";
-const ANDROID_CLIENT_ID =
-	"873978168538-rqldnkikpajuk8mjeou3t7pjof8ebupj.apps.googleusercontent.com";
 const AuthContext = createContext({} as IAuthContextData);
 const userStorageKey = "@" + AppInfo.name + ":" + "user";
 
